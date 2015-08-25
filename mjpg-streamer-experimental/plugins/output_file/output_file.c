@@ -248,37 +248,45 @@ void *worker_thread(void *arg)
             memset(buffer1, 0, sizeof(buffer1));
             memset(buffer2, 0, sizeof(buffer2));
 
+            
             /* get current time */
+            /*
             t = time(NULL);
             now = localtime(&t);
             if(now == NULL) {
                 perror("localtime");
                 return NULL;
             }
+            */
+            
 
             /* prepare string, add time and date values */
+            /*
             if(strftime(buffer1, sizeof(buffer1), "%%s/%Y_%m_%d_%H_%M_%S_picture_%%09llu.jpg", now) == 0) {
                 OPRINT("strftime returned 0\n");
                 free(frame); frame = NULL;
                 return NULL;
             }
+            */
 
             /* finish filename by adding the foldername and a counter value */
+            /*
             snprintf(buffer2, sizeof(buffer2), buffer1, folder, counter);
 
             counter++;
 
             DBG("writing file: %s\n", buffer2);
+            */
 
-            /* open file for write */
-            if((fd = open(buffer2, O_CREAT | O_RDWR | O_TRUNC, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH)) < 0) {
-                OPRINT("could not open the file %s\n", buffer2);
+            /* open pipe for write - we are assuming it exists because mjpg-streamer will be called from the sorter control program in our case */
+            if((fd = open("/home/sorter/jpgstream", O_WRONLY, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH)) < 0) {
+                OPRINT("%s\n", "Unable to open pipe /home/sorter/jpgstream");
                 return NULL;
             }
 
             /* save picture to file */
             if(write(fd, frame, frame_size) < 0) {
-                OPRINT("could not write to file %s\n", buffer2);
+                OPRINT("%s\n", "Unable to write to pipe /home/sorter/jpgstream");
                 perror("write()");
                 close(fd);
                 return NULL;
